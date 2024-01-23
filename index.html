@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link href="fyle.css" rel="stylesheet" />
+    <script
+      src="https://code.jquery.com/jquery-3.7.0.min.js"
+      integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g="
+      crossorigin="anonymous"
+    ></script>
+    <script type="module">
+      const username = prompt("Please enter username");
+      let userData;
+
+      let page_no = 1;
+      import { Octokit } from "https://esm.sh/@octokit/core";
+      const ACCESS_TOKEN = "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";
+      const octokit = new Octokit({
+        auth: ACCESS_TOKEN,
+      });
+
+      async function getUser() {
+        try {
+          const user = await octokit.request(`GET /users/${username}`, {
+            username: username,
+            headers: {
+              "X-GitHub-Api-Version": "2022-11-28",
+            },
+          });
+          userData = user;
+
+          $("#user-details")
+            .append(`<img src="${user.data.avatar_url}" class="image mb-4" />
+            <p class="mb-1" style="font-weight: bold; font-size: 24px">${user.data.name}</p>
+            <p class="user" style="font-size: 20px">${user.data.login}</p>
+      `);
+        } catch (error) {
+          $(".container").append(
+            "<p>User not found. Please enter a valid username</p>"
+          );
+        }
+      }
+      async function getRepos(page_no) {
+        $("#repo").empty();
+        $("#repo").append(`<div class="spinner-border mt-4" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>`);
+        const res = await octokit.request(`GET /users/${username}/repos`, {
+          username: username,
+          type: "all",
+          per_page: 10,
+          page: page_no,
+          headers: {
+            "X-GitHub-Api-Version": "2022-11-28",
+          },
+        });
+        $("#repo").empty();
+        res.data.map((item, index) => {
+          $("#repo").append(`
+            <div class="col-6">
+                <span class="name">${item.name}</span>
+                <span class="pub">${item.visibility}</span>
+                <div>
+                    <div class="dot"></div>
+                    <span class="type">${item.language}</span>
+                    <p class="topics-${index} mt-2 mb-0"></p>
+                </div>
+            </div>`);
+          item.topics.map((topic) => {
+            $(`.topics-${index}`).append(
+              `<span class="badge text-bg-light me-1">{topic}</span>`
+            );
+          });
+        });
+      }
+
+      function addPagination(user) {
+        [...Array(Math.ceil(user.data.public_repos / 10))].map(
+          (item, index) => {
+            let li = document.createElement("li");
+            li.className = "page-item";
+            li.innerHTML = `<a class="page-link" href="#">${index + 1}</a>`;
+            $(".pagination").append(li);
+            li.onclick = (e) => {
+              $(".page-item").removeClass("active");
+              e.currentTarget.classList.add("active");
+              getRepos(index + 1);
+            };
+          }
+        );
+      }
+
+      if (!username || username == "") {
+        $(".container").append("<p>User name cant be empty</p>");
+      } else {
+        await getUser();
+        if (userData) {
+          await getRepos(page_no);
+          addPagination(userData);
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+        <div class="col-4" id="user-details">
+          <!-- <img src="#" class="image" />
+            <p style="font-weight: bold">Abhishek Bansal</p>
+            <p class="user">Username</p> -->
+        </div>
+        <div class="col-8">
+          <div class="row justify-content-center" id="repo">
+            <!-- <div class="col-6">
+                        <span class="name">redux-itunes</span>
+                        <span class="pub">Public</span>
+                        <div>
+                            <div class="dot"></div>
+                            <span class="type">JavaScript</span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <span class="name">redux-todo</span>
+                        <span class="pub">Public</span>
+                        <div>
+                            <div class="dot"></div>
+                            <span class="type">JavaScript</span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <span class="name">foodcham.github.io</span>
+                        <span class="pub">Public</span>
+                        <div>
+                            <div class="dot"></div>
+                            <span class="type">JavaScript</span>
+                        </div>
+                    </div>     
+                    <div class="col-6">
+                        <span class="name">migration2pwa</span>
+                        <span class="pub">Public</span>
+                        <div>
+                            <div class="dot"></div>
+                            <span class="type">JavaScript</span>
+                        </div>
+                    </div>             -->
+          </div>
+          <div class="paginate mt-3">
+            <nav aria-label="Page navigation example">
+              <ul class="pagination justify-content-center"></ul>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
