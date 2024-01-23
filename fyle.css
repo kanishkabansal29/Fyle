@@ -1,0 +1,52 @@
+*{
+    box-sizing: border-box;
+}
+body{
+    background-color: black;
+    color: white;
+}
+.image{
+    width: 80%;
+    height: 300px;
+    border-radius: 100%;
+}
+.col-6{
+    border: solid 1px #595857;
+    border-radius: 5px;
+    padding: 16px;
+    width: 40%;
+    margin: 10px 10px;
+}
+.name{
+    font-size: 14px;
+    color: #2f81f7;
+    font-weight: 600;
+}
+.name:hover{
+    text-decoration: underline ;
+}
+.pub{
+    font-size: 14px;
+    color:#717073;
+    border: solid 1px #717073;
+    border-radius: 10px;
+    margin: 5px;
+    padding: 0 4px;
+    text-transform: capitalize;
+}
+.dot{
+    border-radius: 100%;
+    background-color: yellow;
+    width: 10px;
+    height: 10px;
+    display: inline-block;
+}
+.type{
+    font-size: 12px;
+}
+.user{
+    color: #717073;
+}
+.paginate{
+    text-align: center;
+}
